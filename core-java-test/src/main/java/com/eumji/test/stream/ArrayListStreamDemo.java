@@ -64,7 +64,7 @@ public class ArrayListStreamDemo {
         people.add(new Person("lisi",13));
 
         Integer sum = people.stream().filter(Objects::nonNull).map(Person::getAge).reduce(ArrayListStreamDemo::apply).orElse(0);
-        logger.info("the total is : {}",sum);
+        logger.info("{}.{} method the total is : {}",ArrayListStreamDemo.class.getCanonicalName(),"main",sum);
 
     }
 }
