@@ -9,7 +9,7 @@ import net.sf.cglib.proxy.Enhancer;
  *
  * 原因不明
  *
- * @author lenovo
+ * @author eumji
  * @date 2018/2/7
  */
 public class CglibProxyTest {

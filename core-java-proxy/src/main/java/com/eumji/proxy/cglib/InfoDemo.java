@@ -1,7 +1,7 @@
 package com.eumji.proxy.cglib;
 
 /**
- * @author lenovo
+ * @author eumji
  * @date 2018/2/7
  */
 public  class InfoDemo {

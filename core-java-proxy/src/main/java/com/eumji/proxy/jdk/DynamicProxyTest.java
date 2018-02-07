@@ -4,24 +4,24 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+/**
+ * 文章 http://blog.csdn.net/jsu_9207/article/details/51394697
+ */
 public class DynamicProxyTest {
-
-	interface Demo
-	{
-		void print();
+	interface Ihello{
+		void sayHello();
 	}
 
-	static class DemoImpl implements Demo{
+	static class Hello implements Ihello{
 
 		@Override
-		public void print() {
-			// TODO Auto-generated method stub
-			System.out.println("我是目标方法!");
+		public void sayHello() {
+			System.out.println("hello world!");
 		}
 
 	}
 
-	static class DynamicProxy implements InvocationHandler{
+	static class DynamicProxy implements InvocationHandler {
 
 		Object originalObj;
 
@@ -29,9 +29,9 @@ public class DynamicProxyTest {
 			this.originalObj = originalObj;
 			return Proxy.newProxyInstance(originalObj.getClass().getClassLoader(), originalObj.getClass().getInterfaces(), this);
 		}
+
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			// TODO Auto-generated method stub
 			System.out.println("welcome");
 			return method.invoke(originalObj, args);
 		}
@@ -39,11 +39,10 @@ public class DynamicProxyTest {
 	}
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles", "true");
-		Demo hello = (Demo) new DynamicProxy().bind(new DemoImpl());
-		hello.print();
+		//用于生成代理类文件
+		System.getProperties().put("sun.misc.ProxyGenerator.saveGeneratedFiles","true");
+		Ihello hello = (Ihello) new DynamicProxy().bind(new Hello());
+		hello.sayHello();
 
 	}
-
 }

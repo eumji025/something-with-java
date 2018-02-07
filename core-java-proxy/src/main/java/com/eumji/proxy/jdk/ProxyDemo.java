@@ -3,10 +3,13 @@ package com.eumji.proxy.jdk;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-
+/**
+ * @author eumji025
+ * @date 2018/2/7
+ */
 public class ProxyDemo {
 
-	static interface Base{
+	interface Base{
 		void hello(String name);
 		void out();
 	}
@@ -33,7 +36,6 @@ public class ProxyDemo {
 
 		@Override
 		public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-			// TODO Auto-generated method stub
 			before();
 			Object invoke = method.invoke(originalObj, args);
 			if (invoke != null) {
