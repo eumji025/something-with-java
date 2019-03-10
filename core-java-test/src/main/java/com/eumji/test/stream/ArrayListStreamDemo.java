@@ -18,7 +18,7 @@ import java.util.Objects;
 public class ArrayListStreamDemo {
 
     private static Logger logger = LoggerFactory.getLogger(ArrayListStreamDemo.class);
-    private static Integer apply(Integer integer, Integer integer2) {
+    private static Integer sum(Integer integer, Integer integer2) {
         return integer + integer2;
     }
 
@@ -63,8 +63,8 @@ public class ArrayListStreamDemo {
         people.add(null);
         people.add(new Person("lisi",13));
 
-        Integer sum = people.stream().filter(Objects::nonNull).map(Person::getAge).reduce(ArrayListStreamDemo::apply).orElse(0);
-        logger.info("{}.{} method the total is : {}",ArrayListStreamDemo.class.getCanonicalName(),"main",sum);
+        Integer sum = people.stream().filter(Objects::nonNull).map(Person::getAge).reduce(ArrayListStreamDemo::sum).orElse(0);
+        logger.info("arrays total sum is : {}",sum);
 
     }
 }
