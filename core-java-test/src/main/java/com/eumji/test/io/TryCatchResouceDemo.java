@@ -11,7 +11,7 @@ import java.util.stream.Stream;
  *
  *   hello.txt在resources中有，只要复制到d盘根目录即可
  *
- * @author lenovo
+ * @author eumji
  * @date 2018/3/14
  */
 public class TryCatchResouceDemo {
@@ -22,7 +22,10 @@ public class TryCatchResouceDemo {
     public static void readFile6(){
         BufferedReader bufferedReader = null;
         try {
-            bufferedReader = new BufferedReader(new FileReader(new File("d:/hello.txt")));
+
+            String path = TryCatchResouceDemo.class.getClassLoader().getResource("./").getPath();
+
+            bufferedReader = new BufferedReader(new FileReader(new File(path+"/hello.txt")));
             String line;
             while ((line = bufferedReader.readLine()) != null){
                 System.out.println(line);
