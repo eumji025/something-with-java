@@ -63,30 +63,44 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     
 
     String name = "default";
+    //最大对列数
     int maxQueueSize;
+    //初始化线程数
     int initialThreads;
+    //最低线程数（核心线程数）
     int lowWaterMark;
-    int highWaterMark; 
+    //最大线程数
+    int highWaterMark;
+    //超时时间
     long dequeueTimeout;
+
     volatile int approxThreadCount;
 
     //添加一个步长
     private int addWorkerStep = 2000;
 
+    //代理的线程池本尊
     ThreadPoolExecutor executor;
+    //添加线程对应的方法
     Method addWorkerMethod;
+    //addWorker对应的参数
     Object addWorkerArgs[];
-    
+
+    //线程工厂
     AWQThreadFactory threadFactory;
+
+    //线程池的锁
     ReentrantLock mainLock;
+
+    //有点鸡肋
     final ReentrantLock addThreadLock = new ReentrantLock();
-    
+    //
     DelayQueue<DelayedTaskWrapper> delayQueue;
+    //看门狗
     WatchDog watchDog;
     
     boolean shared;
-    int sharedCount;
-    
+
     private List<PropertyChangeListener> changeListenerList;
     
     public AutomaticWorkQueueImpl() {
@@ -151,15 +165,6 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
     public boolean isShared() {
         return shared;
     }
-    public void addSharedUser() {
-        sharedCount++;
-    }
-    public void removeSharedUser() {
-        sharedCount--;
-    }
-    public int getShareCount() {
-        return sharedCount;
-    }
     
     protected synchronized ThreadPoolExecutor getExecutor() {
         if (executor == null) {
@@ -184,13 +189,12 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             
                     
             if (LOG.isLoggable(Level.FINE)) {
-                StringBuilder buf = new StringBuilder();
-                buf.append("Constructing automatic work queue with:\n");
-                buf.append("max queue size: " + maxQueueSize + "\n");
-                buf.append("initialThreads: " + initialThreads + "\n");
-                buf.append("lowWaterMark: " + lowWaterMark + "\n");
-                buf.append("highWaterMark: " + highWaterMark + "\n");
-                LOG.fine(buf.toString());
+                String buf = "Constructing automatic work queue with:\n" +
+                        "max queue size: " + maxQueueSize + "\n" +
+                        "initialThreads: " + initialThreads + "\n" +
+                        "lowWaterMark: " + lowWaterMark + "\n" +
+                        "highWaterMark: " + highWaterMark + "\n";
+                LOG.fine(buf);
             }
     
             if (initialThreads > highWaterMark) {
@@ -212,7 +216,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
                 executor.setCorePoolSize(lowWaterMark);
             }
     
-            ReentrantLock l = null;
+            ReentrantLock l;
             try {
                 Field f = ThreadPoolExecutor.class.getDeclaredField("mainLock");
                 ReflectionUtil.setAccessible(f);
@@ -279,16 +283,7 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
         }
 
         public int compareTo(Delayed delayed) {
-            long other = ((DelayedTaskWrapper)delayed).trigger;
-            int returnValue;
-            if (this.trigger < other) {
-                returnValue = -1;
-            } else if (this.trigger > other) {
-                returnValue = 1;
-            } else {
-                returnValue = 0;
-            }
-            return returnValue;
+            return Long.compare(this.trigger, ((DelayedTaskWrapper) delayed).trigger);
         }
 
         public void run() {
@@ -316,12 +311,10 @@ public class AutomaticWorkQueueImpl implements AutomaticWorkQueue {
             try {
                 while (!shutdown.get()) {
                     task = delayQueue.take();
-                    if (task != null) {
-                        try {
-                            execute(task);
-                        } catch (Exception ex) {
-                            LOG.warning("Executing the task from DelayQueue with exception: " + ex);
-                        }
+                    try {
+                        execute(task);
+                    } catch (Exception ex) {
+                        LOG.warning("Executing the task from DelayQueue with exception: " + ex);
                     }
                 }
             } catch (InterruptedException e) {

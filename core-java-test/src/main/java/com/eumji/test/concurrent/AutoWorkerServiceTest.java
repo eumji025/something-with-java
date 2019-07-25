@@ -2,6 +2,8 @@ package com.eumji.test.concurrent;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -18,6 +20,26 @@ import java.util.concurrent.TimeUnit;
  *
  */
 public class AutoWorkerServiceTest {
+
+	public static void jdkPoolRejectTest(){
+		ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(5, 20, 30000L, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(4000), Executors.defaultThreadFactory(),new RejectedExecutionHandler(){
+
+			@Override
+			public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
+				boolean shutdown = executor.isShutdown();
+				if (shutdown){
+					System.out.println("线程池已经被shutdown，无法再提交任务");
+				}
+				try {
+					Thread.sleep(3000L);
+					executor.getQueue().offer(r);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+	}
 
 
 	public static void jdkPoolTest(){
